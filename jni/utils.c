@@ -297,6 +297,8 @@
     logd ("utils_init");
 
     prop_buf_get ("ro.product.device",          sys_prop_device);
+      if(strlen(sys_prop_device) <= 1)
+        prop_buf_get("ro.product.name",         sys_prop_device);
     prop_buf_get ("ro.product.manufacturer",    sys_prop_manuf);
     prop_buf_get ("ro.product.board",           sys_prop_board);
     prop_buf_get ("ro.board.platform",          sys_prop_platform);
