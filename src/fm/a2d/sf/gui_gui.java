@@ -432,7 +432,7 @@ public class gui_gui implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
       }
     }
 
-    if (! com_uti.file_get ("/dev/s2d_running"))                        // If daemon not running
+    if (! com_uti.file_get (svc_tnr.s2d_running_file))                        // If daemon not running
       m_gui_act.showDialog (DAEMON_START_DIALOG);                       // Show the Start dialog
 
     String band = com_uti.prefs_get (m_context, "tuner_band", "EU");
@@ -1487,7 +1487,7 @@ int f_freq_hi = 399999;
   }
 
   private void cdown_error_handle (int err) {
-    com_uti.logd ("svc_phase: " + svc_phase + "  svc_count: " + svc_count + "  svc_cdown: " + svc_cdown);
+    com_uti.logd ("err: " + err + "  svc_phase: " + this.svc_phase + "  svc_count: " + this.svc_count + "  svc_cdown: " + this.svc_cdown);
     cdown_timeout_stop ();
     svc_count = err;
     String err_str = svc_phase;
@@ -1497,23 +1497,23 @@ int f_freq_hi = 399999;
       err_str = "ERROR " + err  + " " + svc_phase;
 
     if (err_str.toLowerCase ().contains ("daemon")) {
-      com_uti.loge ("ERROR Daemon /dev/s2d_running: " + com_uti.quiet_file_get ("/dev/s2d_running"));
+      com_uti.loge ("ERROR Daemon s2d_running: " + com_uti.quiet_file_get (svc_tnr.s2d_running_file));
       daemon_start_dialog_dismiss ();
       //if (! com_uti.quiet_file_get ("/dev/s2d_running"))
         m_gui_act.showDialog (DAEMON_ERROR_DIALOG);
     }
     else if (err_str.toLowerCase ().contains ("tuner api")) {
-      com_uti.loge ("ERROR Tuner API /dev/s2d_running: " + com_uti.quiet_file_get ("/dev/s2d_running"));
+      com_uti.loge ("ERROR Tuner API s2d_running: " + com_uti.quiet_file_get (svc_tnr.s2d_running_file));
       daemon_start_dialog_dismiss ();
       m_gui_act.showDialog (TUNER_API_ERROR_DIALOG);
     }
     else if (err_str.toLowerCase ().contains ("tuner")) {
-      com_uti.loge ("ERROR Tuner /dev/s2d_running: " + com_uti.quiet_file_get ("/dev/s2d_running"));
+      com_uti.loge ("ERROR Tuner s2d_running: " + com_uti.quiet_file_get (svc_tnr.s2d_running_file));
       daemon_start_dialog_dismiss ();
       m_gui_act.showDialog (TUNER_ERROR_DIALOG);
     }
     else if (err_str.toLowerCase ().contains ("bluetooth")) {
-      com_uti.loge ("ERROR Broadcom Bluetooth /dev/s2d_running: " + com_uti.quiet_file_get ("/dev/s2d_running"));
+      com_uti.loge ("ERROR Broadcom Bluetooth s2d_running: " + com_uti.quiet_file_get (svc_tnr.s2d_running_file));
       daemon_start_dialog_dismiss ();
     }
 
@@ -1543,7 +1543,7 @@ int f_freq_hi = 399999;
     }
 
                                                                         // If daemon is running and daemon start dialog is showing, dismiss dialog
-    if (daemon_start_dialog != null && com_uti.quiet_file_get ("/dev/s2d_running")) {
+    if (daemon_start_dialog != null && com_uti.quiet_file_get(svc_tnr.s2d_running_file)) {
       daemon_start_dialog_dismiss ();
     }
 

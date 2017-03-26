@@ -163,7 +163,7 @@ public class svc_tnr implements svc_tap {
   }
 
 
-  private static final String s2d_running_file = "/dev/s2d_running";
+  public static final String s2d_running_file = "/dev/s2d_running";
 
   private boolean s2d_running_wait (boolean running, int tmo_ms) {
     com_uti.logd ("poll for s2d_running");
@@ -210,6 +210,8 @@ public class svc_tnr implements svc_tap {
         m_com_api.tuner_state = "Starting";                             // Starting...
 
         if (com_uti.file_get (s2d_running_file)) {                      // If "s2d daemon running" file already exists (if still running or was unexpectedly killed)
+          ret = com_uti.sys_run("chmod 777 /dev/s2d_running", true);
+          com_uti.logd("chmod 777 s2d_running_file ret: " + ret);
           com_uti.file_delete (s2d_running_file);
           com_uti.loge ("HAVE s2d_running_file: " + s2d_running_file);
           if (com_uti.file_get (s2d_running_file))                      // If we can't delete the "s2d daemon running" file

@@ -728,6 +728,8 @@ public final class com_uti  {
       ret = true;
     else if (com_uti.file_get ("/system/xbin/su"))
       ret = true;
+    else if (com_uti.file_get ("/su/bin/su"))
+      ret = true;
     com_uti.logd ("ret: " + ret);
     return (ret);
   }
@@ -745,10 +747,17 @@ public final class com_uti  {
 
     try {
       Process p;
-      if (su)
-        p = Runtime.getRuntime ().exec ("su");
-      else
-        p = Runtime.getRuntime ().exec ("sh");
+      if (su) {
+        if (file_get("/sdcard/s2_sacon") && cmds[0].startsWith("/data/local/s2d server_mode")) {
+            p = Runtime.getRuntime().exec ("su", "--context", "u:r:system_app:s0");
+        }
+        else {
+            p = Runtime.getRuntime ().exec ("su");
+        }
+      }
+      else {
+           p = Runtime.getRuntime ().exec ("sh");
+         }
       DataOutputStream os = new DataOutputStream (p.getOutputStream ());
       for (String line : cmds) {
         logd ("su: " + su + "  line: " + line);
@@ -1650,6 +1659,7 @@ Evo 4G LTE  jewel
 
 
   public static int setDeviceConnectionState (final int device, final int state, final String address) {   // Called by audio_output_off () & audio_output_set ()
+    boolean rvBool = false;
     int ret = -3;
     com_uti.logd ("device: " + device + "  state: " + state + "  address: '" + address + "'");
     //output_audio_routing_get ();
@@ -1660,12 +1670,31 @@ Evo 4G LTE  jewel
       ret = (Integer) setDeviceConnectionState.invoke (audioSystem, device, state, address);
       com_uti.logd ("ret: " + ret);
     }
+    catch (NoSuchMethodException nsme) {
+      com_uti.logw ("Reverse exception: " + nsme);
+      rvBool = true;
+    }
     catch (Exception e) {
       com_uti.loge ("exception: " + e);
     }
+    if (!rvBool){
+      return (ret);
+    }
+
+    try {
+      Class<?> audioSystem = Class.forName ("android.media.AudioSystem");
+      Method setDeviceConnectionState = audioSystem.getMethod ("setDeviceConnectionState", int.class, int.class, String.class, String.class);
+      ret = (Integer) setDeviceConnectionState.invoke (audioSystem, device, state, address, "");
+      com_uti.logd ("ret: " + ret);
+      return (ret);
+      } catch (Exception e2) {
+            loge("exception: " + e2);
+            return (ret);
+      }
+
     //output_audio_routing_get ();
     //input_audio_routing_get ();
-    return (ret);
+    //return (ret);
   }
 
   public static int getDeviceConnectionState (final int device, final String address) {   // Reflector
